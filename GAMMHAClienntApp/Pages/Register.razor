@@ -1,0 +1,42 @@
+﻿@inject NavigationManager NavigationManager
+@page "/Register"
+
+<div class="row">
+    <div class="col-3">
+
+    </div>
+    <form class="col-6" style="margin-top: 100Px">
+    <!-- Email input -->
+        <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+        <input type="email" id="form2Example1" class="form-control" />
+        <label class="form-label" for="form2Example1">Email address</label>
+    </div>
+    <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+        <input type="email" id="form2Example1" class="form-control" />
+        <label class="form-label" for="form2Example1">Email address</label>
+    </div>
+
+    <!-- Password input -->
+        <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+        <input type="password" id="form2Example2" class="form-control" />
+        <label class="form-label" for="form2Example2">Password</label>
+    </div>
+
+
+
+    <!-- Submit button -->
+        <button type="button" class="btn btn-primary btn-block mb-4" @onclick=GotoHomePage>Register</button>
+
+    <!-- Register buttons -->
+    
+</form>
+    <div class="col-3">
+    </div>
+</div>
+
+@code {
+    public void GotoHomePage()
+    {
+        NavigationManager.NavigateTo("/Home");
+    }
+}

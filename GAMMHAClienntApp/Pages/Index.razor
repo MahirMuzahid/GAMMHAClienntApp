@@ -1,0 +1,60 @@
+﻿@using Flurl;
+@using Flurl.Http;
+@using GAMMHAClienntApp.Data
+@using System.Net.Http.Headers;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject NavigationManager NavigationManager
+@page "/"
+
+<div class="row">
+    <div class="col-3">
+
+    </div>
+    <form class="col-6" style="margin-top: 100Px">
+    <!-- Email input -->
+        <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+        <input type="email" id="form2Example1" class="form-control" />
+        <label class="form-label" for="form2Example1">Email address</label>
+    </div>
+
+    <!-- Password input -->
+        <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+        <input type="password" id="form2Example2" class="form-control" />
+        <label class="form-label" for="form2Example2">Password</label>
+    </div>
+
+   
+
+    <!-- Submit button -->
+        <button type="button" class="btn btn-primary btn-block mb-4" @onclick=GotoHomePage>Sign in</button>
+
+    <!-- Register buttons -->
+    <div class="text-center">
+        <p>Not a member? <a href="/Register">Register</a></p>
+        
+    </div>
+</form>
+    <div class="col-3">
+    </div>
+</div>
+
+@code {
+    List<Employee> employeeList = new List<Employee>();
+  
+    //List<User> userList = new List<User>();
+    
+
+    
+    
+    public void GotoHomePage()
+    {
+        NavigationManager.NavigateTo("/Home");
+    }
+    //public async Task GetAllUsere()
+    //{
+    //    var uList = await "https://gammhaapi.gal-cloud.com/User/GetAllUser".GetJsonAsync<List<User>>();
+    //    userList = uList;
+
+    //}
+}

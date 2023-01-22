@@ -1,0 +1,168 @@
+﻿@page "/Home"
+@using GAMMHAClienntApp.Data
+@using System.Net.Http.Headers;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+<div style="background-color: #EFEFEF">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-title">
+                <h3>Employee</h3>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                </div>
+                <div class="col-6">
+
+                    <div>
+                        <table class="table">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Employee ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Designation</th>
+                                    <th scope="col">Company Name</th>
+                                    <th scope="col">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var em in employeeList)
+                                {
+                                <tr>
+                                    <td>@em.employee_ID</td>
+                                        <td>@em.employee_Name</td>
+                                        <td>@em.employee_Designation</td>
+                                        <td>@em.company_Name</td>
+                                    <td><button class="btn btn-danger">Delete</button></td>
+                                </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="col-3">
+                </div>
+            </div>
+
+            <div>
+                <div class="row" style="margin-left: 10px; margin-right: 10px;">
+                    <div class="col-3">
+                        <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+                            <input type="email" id="form2Example1" class="form-control" @bind="emName"/>
+                            <label class="form-label" for="form2Example1">Name</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+                            <input type="email" id="form2Example1" class="form-control" @bind="emDesignation" />
+                            <label class="form-label" for="form2Example1">Designation</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
+                            <input type="email" id="form2Example1" class="form-control" @bind="emCompanyName" />
+                            <label class="form-label" for="form2Example1">Company Name</label>
+                        </div>
+                    </div>
+
+                </div>
+                <button class="btn btn-primary" style="margin-left: 10px">Add Employyee</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-body">
+            <div class="card-title">
+                <h3>Firmgate Location</h3>
+            </div>
+            <div class="mapouter">
+                <div class="gmap_canvas">
+                    <iframe width="707" height="510" id="gmap_canvas" src="https://maps.google.com/maps?q=Firmgate&t=&z=15&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a href="https://2yu.co">2yu</a><br><style>
+                                                                                                                                                                                                                                                                         .mapouter {
+                                                                                                                                                                                                                                                                             position: relative;
+                                                                                                                                                                                                                                                                             text-align: right;
+                                                                                                                                                                                                                                                                             height: 510px;
+                                                                                                                                                                                                                                                                             width: 707px;
+                                                                                                                                                                                                                                                                         }</style><a href="https://embedgooglemap.2yu.co">html embed google map</a><style>
+                                                                                                                                                                                                                                                                                                                                                       .gmap_canvas {
+                                                                                                                                                                                                                                                                                                                                                           overflow: hidden;
+                                                                                                                                                                                                                                                                                                                                                           background: none !important;
+                                                                                                                                                                                                                                                                                                                                                           height: 510px;
+                                                                                                                                                                                                                                                                                                                                                           width: 707px;
+                                                                                                                                                                                                                                                                                                                                                       }</style>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    string emName { get; set; }
+    string emDesignation { get; set; }
+    string emCompanyName { get; set; }
+    List<Employee> employeeList = new List<Employee>();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllEmployee();
+    }
+    public async Task GetAllEmployee()
+    {
+        var handler = new HttpClientHandler()
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        using HttpClient client = new(handler);
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+        client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+        var json = await client.GetStringAsync(
+           "http://gammhaapi.gal-cloud.com/Employee/GetAllEmployee");
+        var employees = JsonSerializer.Deserialize<List<Employee>>(json);
+        employeeList = employees;
+
+
+    }
+    public async Task DeleteEmployee()
+    {
+        var handler = new HttpClientHandler()
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        using HttpClient client = new(handler);
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+        client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+        var json = await client.GetStringAsync(
+           "http://gammhaapi.gal-cloud.com/Employee/GetAllEmployee");
+        var employees = JsonSerializer.Deserialize<List<Employee>>(json);
+        employeeList = employees;
+
+
+    }
+    public async Task AddEmployee()
+    {
+        var handler = new HttpClientHandler()
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        using HttpClient client = new(handler);
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+        client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+        var json = await client.GetStringAsync(
+           "http://gammhaapi.gal-cloud.com/Employee/GetAllEmployee");
+        var employees = JsonSerializer.Deserialize<List<Employee>>(json);
+        employeeList = employees;
+
+
+    }
+}
