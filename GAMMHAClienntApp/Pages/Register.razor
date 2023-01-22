@@ -1,4 +1,12 @@
 ﻿@inject NavigationManager NavigationManager
+@using Flurl;
+@using Flurl.Http;
+@using GAMMHAClienntApp.Data
+@using System.Net.Http.Headers;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using System.Text;
+@using GAMMHAClienntApp.Data
 @page "/Register"
 
 <div class="row">
@@ -8,24 +16,24 @@
     <form class="col-6" style="margin-top: 100Px">
     <!-- Email input -->
         <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
-        <input type="email" id="form2Example1" class="form-control" />
-        <label class="form-label" for="form2Example1">Email address</label>
+            <input type="email" id="form2Example1" class="form-control" @bind="username" />
+        <label class="form-label" for="form2Example1">User Name</label>
     </div>
     <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
-        <input type="email" id="form2Example1" class="form-control" />
-        <label class="form-label" for="form2Example1">Email address</label>
+            <input type="email" id="form2Example1" class="form-control" @bind="fullname" />
+        <label class="form-label" for="form2Example1">Full Name</label>
     </div>
 
     <!-- Password input -->
         <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
-        <input type="password" id="form2Example2" class="form-control" />
+            <input type="password" id="form2Example2" class="form-control" @bind="password" />
         <label class="form-label" for="form2Example2">Password</label>
     </div>
 
 
 
     <!-- Submit button -->
-        <button type="button" class="btn btn-primary btn-block mb-4" @onclick=GotoHomePage>Register</button>
+        <button type="button" class="btn btn-primary btn-block mb-4" @onclick=RegisterEmployee>Register</button>
 
     <!-- Register buttons -->
     
@@ -35,8 +43,36 @@
 </div>
 
 @code {
-    public void GotoHomePage()
+    string username { get; set; }
+    string fullname { get; set; }
+    string password { get; set; }
+    public async Task RegisterEmployee()
     {
-        NavigationManager.NavigateTo("/Home");
+        RegisterUserDTO obj = new RegisterUserDTO();
+        Guid guid = Guid.NewGuid();
+        obj.user_ID = guid.ToString("N");
+        obj.user_Name = username;
+        obj.full_Name = fullname;
+        obj.password = password;
+        string DATA = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+        var handler = new HttpClientHandler()
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        using HttpClient client = new(handler);
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+        client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+        HttpContent content = new StringContent(DATA, UTF8Encoding.UTF8, "application/json");
+        var json = await client.PostAsync(
+           "https://gammhaapi.gal-cloud.com/User/RegisterUser", content);
+        if (json.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/Home");
+        }
+
+
     }
+ 
 }

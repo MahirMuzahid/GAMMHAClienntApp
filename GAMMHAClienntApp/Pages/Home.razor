@@ -3,6 +3,7 @@
 @using System.Net.Http.Headers;
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
+@using System.Text;
 <div style="background-color: #EFEFEF">
     <div class="card">
         <div class="card-body">
@@ -22,7 +23,6 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Designation</th>
                                     <th scope="col">Company Name</th>
-                                    <th scope="col">Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -33,7 +33,7 @@
                                         <td>@em.employee_Name</td>
                                         <td>@em.employee_Designation</td>
                                         <td>@em.company_Name</td>
-                                    <td><button class="btn btn-danger">Delete</button></td>
+                                        <td><button class="btn btn-danger" @onclick="() => DeleteEmployee(em.employee_ID)">Delete</button></td>
                                 </tr>
                                 }
 
@@ -69,7 +69,7 @@
                     </div>
 
                 </div>
-                <button class="btn btn-primary" style="margin-left: 10px">Add Employyee</button>
+                <button class="btn btn-primary" style="margin-left: 10px" @onclick="AddEmployee">Add Employyee</button>
             </div>
         </div>
     </div>
@@ -129,8 +129,15 @@
 
 
     }
-    public async Task DeleteEmployee()
+    public async Task AddEmployee()
     {
+        Employee obj = new Employee();
+        Guid guid = Guid.NewGuid();
+        obj.employee_ID = guid.ToString("N");
+        obj.employee_Name = emName;
+        obj.employee_Designation = emDesignation;
+        obj.company_Name = emCompanyName;
+        string DATA = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
         var handler = new HttpClientHandler()
             {
                 ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
@@ -140,15 +147,19 @@
         client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
         client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
-        var json = await client.GetStringAsync(
-           "http://gammhaapi.gal-cloud.com/Employee/GetAllEmployee");
-        var employees = JsonSerializer.Deserialize<List<Employee>>(json);
-        employeeList = employees;
+        HttpContent content = new StringContent(DATA, UTF8Encoding.UTF8, "application/json");
+        var json = await client.PostAsync(
+           "https://gammhaapi.gal-cloud.com/Employee/SetEmployee", content);
+        if (json.IsSuccessStatusCode)
+        {
+            await GetAllEmployee();
+        }
 
 
     }
-    public async Task AddEmployee()
+    public async Task DeleteEmployee( string id)
     {
+        string url = "https://gammhaapi.gal-cloud.com/Employee/DeleteEmployee/"+id;
         var handler = new HttpClientHandler()
             {
                 ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
@@ -158,10 +169,12 @@
         client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
         client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
-        var json = await client.GetStringAsync(
-           "http://gammhaapi.gal-cloud.com/Employee/GetAllEmployee");
-        var employees = JsonSerializer.Deserialize<List<Employee>>(json);
-        employeeList = employees;
+        HttpContent content = new StringContent("", UTF8Encoding.UTF8, "application/json");
+        var json = await client.PostAsync(url, content);
+        if (json.IsSuccessStatusCode)
+        {
+            await GetAllEmployee();
+        }
 
 
     }

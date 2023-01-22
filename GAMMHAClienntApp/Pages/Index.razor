@@ -4,6 +4,7 @@
 @using System.Net.Http.Headers;
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
+@using System.Text;
 @inject NavigationManager NavigationManager
 @page "/"
 
@@ -14,13 +15,13 @@
     <form class="col-6" style="margin-top: 100Px">
     <!-- Email input -->
         <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
-        <input type="email" id="form2Example1" class="form-control" />
-        <label class="form-label" for="form2Example1">Email address</label>
+        <input type="email" id="form2Example1" class="form-control" @bind="username"/>
+        <label class="form-label" for="form2Example1">Username</label>
     </div>
 
     <!-- Password input -->
         <div class="form-outline mb-4" style="background: rgb(236, 236, 236)">
-        <input type="password" id="form2Example2" class="form-control" />
+            <input type="password" id="form2Example2" class="form-control" @bind="password" />
         <label class="form-label" for="form2Example2">Password</label>
     </div>
 
@@ -28,7 +29,7 @@
 
     <!-- Submit button -->
         <button type="button" class="btn btn-primary btn-block mb-4" @onclick=GotoHomePage>Sign in</button>
-
+        <label class="text-danger">@errorText</label>
     <!-- Register buttons -->
     <div class="text-center">
         <p>Not a member? <a href="/Register">Register</a></p>
@@ -40,21 +41,43 @@
 </div>
 
 @code {
-    List<Employee> employeeList = new List<Employee>();
-  
-    //List<User> userList = new List<User>();
-    
+    string username { get; set; }
+    string password { get; set; }
+    string errorText { get; set; }
 
-    
-    
-    public void GotoHomePage()
+
+
+
+    public async Task GotoHomePage()
     {
-        NavigationManager.NavigateTo("/Home");
-    }
-    //public async Task GetAllUsere()
-    //{
-    //    var uList = await "https://gammhaapi.gal-cloud.com/User/GetAllUser".GetJsonAsync<List<User>>();
-    //    userList = uList;
+        errorText = "";
+        UserDTO obj = new UserDTO();
+        obj.user_Name = username;
+        obj.password = password;
 
-    //}
+        string DATA = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+        var handler = new HttpClientHandler()
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        using HttpClient client = new(handler);
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+        client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+        HttpContent content = new StringContent(DATA, UTF8Encoding.UTF8, "application/json");
+        var json = await client.PostAsync(
+           "https://gammhaapi.gal-cloud.com/User/Login", content);
+        if (!json.IsSuccessStatusCode)
+        {
+            errorText = "Wrong Id or Password";
+
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/Home");
+        }
+        
+    }
+    
 }
